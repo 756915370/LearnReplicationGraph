@@ -26,14 +26,6 @@ void UReplicationGraphNode_AlwaysRelevant_ForTeam::GatherActorListsForConnection
 	//UE_LOG(LogTemp, Warning, TEXT("RepG AlwaysRelevant_ForTeam GetActors"));
 	UTutorialRepGraph* ReplicationGraph = Cast<UTutorialRepGraph>(GetOuter());
 	const UTutorialConnectionManager* ConnectionManager = Cast<UTutorialConnectionManager>(&Params.ConnectionManager);
-	if(ReplicationGraph == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("RepG AlwaysRelevant_ForTeam Null Graph"));
-	}
-	if(ConnectionManager==nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("RepG AlwaysRelevant_ForTeam Null ReGConnection"));
-	}
 	if (ReplicationGraph && ConnectionManager && ConnectionManager->Team != -1)
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("RepG AlwaysRelevant_ForTeam GetActors CurrentTeam:%d"), ConnectionManager->Team);
@@ -41,8 +33,6 @@ void UReplicationGraphNode_AlwaysRelevant_ForTeam::GatherActorListsForConnection
 			GetConnectionArrayForTeam(ConnectionManager->Team))
 		{
 			TArray<UTutorialConnectionManager*> TeamConnectionsRef = *TeamConnections;
-			//UE_LOG(LogTemp, Warning, TEXT("RepG AlwaysRelevant_ForTeam GetActors CurrentTeam:%d SameTeamCount:%d"),
-			       //ConnectionManager->Team, TeamConnectionsRef.Num());
 			for (const UTutorialConnectionManager* TeamMember : *TeamConnections)
 			{
 				TeamMember->TeamConnectionNode->GatherActorListsForConnectionDefault(Params);
@@ -210,11 +200,6 @@ void UTutorialRepGraph::RouteAddNetworkActorToNodes(const FNewReplicatedActorInf
 		{
 			UE_LOG(LogTemp, Warning, TEXT("RepG RouteAddNetworkActorToNodes Class:%s, AddToTeam"), *ActorClass->GetName());
 			ConnectionManager->TeamConnectionNode->NotifyAddNetworkActor(ActorInfo);
-
-			if (APawn* Pawn = Cast<APawn>(ActorInfo.GetActor()))
-			{
-				ConnectionManager->Pawn = Pawn;
-			}
 		}
 	}
 	else if(ActorInfo.Actor->GetNetOwner())
@@ -319,23 +304,12 @@ UTutorialConnectionManager* UTutorialRepGraph::GetTutorialConnectionManagerFromA
 {
 	if (Actor)
 	{
-		//UE_LOG(LogTemp,Warning,TEXT("RepG,GetTutorialConnectionManagerFromActor :%s"),*Actor->GetName());
 		if (UNetConnection* NetConnection = Actor->GetNetConnection())
 		{
-			//UE_LOG(LogTemp,Warning,TEXT("RepG,GetTutorialConnectionManagerFromActor :%s HaveConnection"),*Actor->GetName());
 			if (UTutorialConnectionManager* ConnectionManager = Cast<UTutorialConnectionManager>(FindOrAddConnectionManager(NetConnection)))
 			{
-				//UE_LOG(LogTemp,Warning,TEXT("RepG,GetTutorialConnectionManagerFromActor :%s HaveConnection HaveRepConnection TotalCount:%d"),*Actor->GetName(),Connections.Num());
 				return ConnectionManager;
 			}
-			else
-			{
-				//UE_LOG(LogTemp,Warning,TEXT("RepG,GetTutorialConnectionManagerFromActor :%s HaveConnection Have not RepConnection"),*Actor->GetName());
-			}
-		}
-		else
-		{
-			//UE_LOG(LogTemp,Warning,TEXT("RepG,GetTutorialConnectionManagerFromActor :%s Have not Connection"),*Actor->GetName());
 		}
 	}
 	
